@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">E-Gate</string>
+    <string name="vehicle_number">Vehicle Number</string>
+    <string name="driver_name">Driver Name</string>
+    <string name="driver_mobile">Driver Mobile</string>
+    <string name="no_of_passengers">No of Passengers</string>
+    <string name="vehicle_type">Vehicle Type</string>
+    <string name="entry_gate">Entry Gate</string>
+    <string name="exit_gate">Exit Gate</string>
+    <string name="trip_type">Trip Purpose</string>
+    <string name="main">e-GATE</string>
+    <string name="entry">Entry Screen</string>
+    <string name="scanner">Scanner Screen</string>
+    <string name="exit">Exit Screen</string>
+    <string name="splash">Splash Screen</string>
+    <string name="back_button">Back</string>
+</resources>

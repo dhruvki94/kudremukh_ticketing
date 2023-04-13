@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "612304724713",
+    "project_id": "national-park-vehicles",
+    "storage_bucket": "national-park-vehicles.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:612304724713:android:243045198a0b2371328678",
+        "android_client_info": {
+          "package_name": "com.example.ticketing"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "612304724713-h4212f8pm45a1335plldp1cds19j41cu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAp2dmJ3YUJCv6u35ltxKDhHzHrOJyXT7o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "612304724713-h4212f8pm45a1335plldp1cds19j41cu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:612304724713:android:631e405c842d7254328678",
+        "android_client_info": {
+          "package_name": "com.example.vehiclesticketing"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "612304724713-h4212f8pm45a1335plldp1cds19j41cu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAp2dmJ3YUJCv6u35ltxKDhHzHrOJyXT7o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "612304724713-h4212f8pm45a1335plldp1cds19j41cu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
