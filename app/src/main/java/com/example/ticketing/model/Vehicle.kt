@@ -11,11 +11,12 @@ data class Vehicle(
   val driverName: String = "",
   val driverMobile: String = "",
   val noOfPassengers: String = "",
-  val vehicleType: String = "",
+  val vehicleType: String = VehicleType.LMV.name,
   val entryGate: String = "",
   val exitGate:  String = "",
-  val tripType: String = "",
+  val tripType: String = TripType.Transit.name,
   val entryTimestamp: Long = System.currentTimeMillis(),
   val exitTimestamp: Long? = null,
   val status:  String = "",
+  val exemptRemark: String = ""
 )

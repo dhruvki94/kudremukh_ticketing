@@ -1,28 +1,28 @@
 package com.example.ticketing.screens.vehicle_exit
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.ticketing.R.string as Apptext
 import com.example.ticketing.TicketingScreens
+import com.example.ticketing.common.BasicField
 import com.example.ticketing.model.VehicleStatus
 import kotlinx.coroutines.launch
-import java.io.Console
 import java.text.SimpleDateFormat
-import java.time.LocalDateTime
 import java.util.*
 import kotlin.math.roundToInt
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun VehicleExitScreen(
   modifier: Modifier = Modifier,
@@ -39,7 +39,6 @@ fun VehicleExitScreen(
   LaunchedEffect(key1 = Unit) {
     viewModel.fetchByQr(qrReference)
   }
-  println(vehicle)
 
   if (showDialog.value) {
     ConfirmDialog(
@@ -74,7 +73,7 @@ fun VehicleExitScreen(
     if (vehicle.status.isBlank()) {
       AlertDialog(
         onDismissRequest = { navController.popBackStack() },
-        title = { Text(text = "Please go back and scan again.") },
+        title = { Text(text = "Please go back and try again.") },
         dismissButton = {
           TextButton(
             onClick = { navController.popBackStack() }) { Text(text = "Go Back") }
@@ -85,16 +84,15 @@ fun VehicleExitScreen(
         modifier = modifier
           .fillMaxSize()
           .padding(10.dp),
-        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
       ) {
-        Box() {
+        Box {
           when (vehicle.status) {
             VehicleStatus.OnTime.name -> {
               Text(
                 text = "ON TIME",
                 color = Color.Green,
-                fontSize = 36.sp,
+                fontSize = 48.sp,
                 fontWeight = FontWeight.Bold
               )
             }
@@ -102,7 +100,7 @@ fun VehicleExitScreen(
               Text(
                 text = "DELAYED",
                 color = Color.Red,
-                fontSize = 36.sp,
+                fontSize = 48.sp,
                 fontWeight = FontWeight.Bold
               )
             }
@@ -110,43 +108,70 @@ fun VehicleExitScreen(
               Text(
                 text = "OVER-SPEEDING",
                 color = Color.Red,
-                fontSize = 36.sp,
+                fontSize = 48.sp,
                 fontWeight = FontWeight.Bold
               )
             }
           }
         }
-        Spacer(modifier = modifier.height(6.dp))
+        val spaceModifierFull = modifier.height(10.dp)
+        val spaceModifierHalf = modifier.height(5.dp)
+
+        Spacer(spaceModifierHalf)
+        Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
+          Text(text = "Token No: ", fontSize = 30.sp)
+          Text(text = vehicle.qrReference, fontWeight = FontWeight.Bold, fontSize = 30.sp, color = Color.Magenta)
+        }
+        Spacer(spaceModifierFull)
+        Divider(thickness = 1.dp, color = Color.LightGray)
+        Spacer(spaceModifierFull)
+
         VehicleField(key = "Time Started: ", value = timeFormat.format(Date(vehicle.entryTimestamp)))
-        Spacer(modifier = modifier.height(3.dp))
+        Spacer(spaceModifierHalf)
         vehicle.exitTimestamp ?.let { VehicleField(key = "Time Ended: ", value = timeFormat.format(Date(it))) }
-        Spacer(modifier = modifier.height(3.dp))
+        Spacer(spaceModifierHalf)
         vehicle.exitTimestamp?.let { VehicleField(key = "Time Taken: ", value = ((( it - vehicle.entryTimestamp) / 1000.0) / 60.0).roundToInt().toString().plus(" minutes")) }
-        Spacer(modifier = modifier.height(6.dp))
-        Divider(thickness = 1.dp, color = Color.Black)
-        Spacer(modifier = modifier.height(6.dp))
+
+        Spacer(spaceModifierFull)
+        Divider(thickness = 1.dp, color = Color.LightGray)
+        Spacer(spaceModifierFull)
+
         VehicleField(key = "Vehicle Number: ", value = vehicle.vehicleNumber)
-        Spacer(modifier = modifier.height(3.dp))
+        Spacer(spaceModifierHalf)
         VehicleField(key = "Type of Vehicle: ", value = vehicle.vehicleType)
-        Spacer(modifier = modifier.height(6.dp))
-        Divider(thickness = 1.dp, color = Color.Black)
-        Spacer(modifier = modifier.height(6.dp))
+
+        Spacer(spaceModifierFull)
+        Divider(thickness = 1.dp, color = Color.LightGray)
+        Spacer(spaceModifierFull)
+
         VehicleField(key = "Driver Name: ", value = vehicle.driverName)
-        Spacer(modifier = modifier.height(3.dp))
+        Spacer(spaceModifierHalf)
         VehicleField(key = "Mobile Number: ", value = vehicle.driverMobile)
-        Spacer(modifier = modifier.height(3.dp))
+        Spacer(spaceModifierHalf)
         VehicleField(key = "Number of Passengers: ", value = vehicle.noOfPassengers)
-        Spacer(modifier = modifier.height(6.dp))
-        Divider(thickness = 1.dp, color = Color.Black)
-        Spacer(modifier = modifier.height(6.dp))
+
+        Spacer(spaceModifierFull)
+        Divider(thickness = 1.dp, color = Color.LightGray)
+        Spacer(spaceModifierFull)
+
         VehicleField(key = "Entry Gate: ", value = vehicle.entryGate)
-        Spacer(modifier = modifier.height(3.dp))
+        Spacer(spaceModifierHalf)
         VehicleField(key = "Exit Gate: ", value = vehicle.exitGate)
+
+        Spacer(spaceModifierFull)
+        Divider(thickness = 1.dp, color = Color.LightGray)
+        Spacer(modifier = modifier.height(15.dp))
+
+        BasicField(text = Apptext.exempt_remark, value = vehicle.exemptRemark, onNewValue = { viewModel.addRemark(it) }, keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters))
+        Spacer(modifier = modifier.height(15.dp))
+
         Button(
           onClick = { showDialog.value = true },
-          colors = ButtonDefaults.buttonColors(backgroundColor = Color.Blue)
+          modifier = modifier
+            .height(75.dp)
+            .width(150.dp)
         ) {
-          Text(text = "Done")
+          Text(text = "Done", fontSize = 28.sp)
         }
       }
     }
@@ -185,8 +210,8 @@ fun VehicleField(
   key: String,
   value: String
 ) {
-  Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()) {
-    Text(text = key, fontWeight = FontWeight.Bold, fontSize = 24.sp)
-    Text(text = value, fontWeight = FontWeight.Black, fontSize = 24.sp)
+  Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+    Text(text = key, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+    Text(text = value, fontWeight = FontWeight.Black, fontSize = 20.sp)
   }
 }

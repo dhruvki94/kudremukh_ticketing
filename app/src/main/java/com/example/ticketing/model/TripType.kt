@@ -1,7 +1,7 @@
 package com.example.ticketing.model
 
 enum class TripType {
-  None,
+  Other,
   Trek,
   Transit,
   Stay;
@@ -10,7 +10,7 @@ enum class TripType {
     fun getByName(name: String?): TripType {
       TripType.values().forEach { tripType -> if (name == tripType.name) return tripType }
 
-      return None
+      return Transit
     }
 
     fun getOptions(): List<String> {

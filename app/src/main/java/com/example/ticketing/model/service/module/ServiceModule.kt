@@ -1,8 +1,8 @@
 package com.example.ticketing.model.service.module
 
-import com.example.ticketing.model.impl.ScannerServiceImpl
+//import com.example.ticketing.model.impl.ScannerServiceImpl
 import com.example.ticketing.model.impl.StorageServiceImpl
-import com.example.ticketing.model.service.ScannerService
+//import com.example.ticketing.model.service.ScannerService
 import com.example.ticketing.model.service.StorageService
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
@@ -22,6 +22,6 @@ object ServiceModule {
   @Singleton
   fun provideFirestore() = FirebaseFirestore.getInstance()
 
-  @Provides
-  fun provideScannerService(impl: ScannerServiceImpl): ScannerService = impl
+//  @Provides
+//  fun provideScannerService(impl: ScannerServiceImpl): ScannerService = impl
 }
