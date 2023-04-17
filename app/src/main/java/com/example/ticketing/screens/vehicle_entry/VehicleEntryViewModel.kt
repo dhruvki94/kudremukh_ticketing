@@ -6,9 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.ticketing.model.Vehicle
 import com.example.ticketing.model.service.StorageService
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.scopes.ViewModelScoped
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

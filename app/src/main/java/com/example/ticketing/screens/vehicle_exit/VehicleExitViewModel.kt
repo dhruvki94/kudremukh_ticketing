@@ -1,6 +1,5 @@
 package com.example.ticketing.screens.vehicle_exit
 
-import android.content.res.Resources.NotFoundException
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,7 +9,6 @@ import com.example.ticketing.model.VehicleStatus
 import com.example.ticketing.model.service.StorageService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import java.time.Instant
 import javax.inject.Inject
 
 @HiltViewModel
@@ -31,9 +29,13 @@ constructor(
     }
   }
 
+  fun addRemark(remark: String) {
+    vehicle.value = vehicle.value.copy(exemptRemark = remark)
+  }
+
   fun onFinishButtonClick(popUpScreen: () -> Unit) {
     viewModelScope.launch {
-      storageService.update(vehicle.value.copy(exitTimestamp = System.currentTimeMillis()))
+      storageService.update(vehicle.value)
       storageService.delete(vehicle.value.qrReference)
     }
     popUpScreen()

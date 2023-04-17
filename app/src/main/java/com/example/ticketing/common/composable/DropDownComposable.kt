@@ -53,7 +53,7 @@ fun DropdownSelector(
 @ExperimentalMaterialApi
 private fun dropdownColors(): TextFieldColors {
   return ExposedDropdownMenuDefaults.textFieldColors(
-    backgroundColor = MaterialTheme.colors.onPrimary,
+    backgroundColor = Color.Transparent,
     focusedIndicatorColor = Color.Transparent,
     unfocusedIndicatorColor = Color.Transparent,
     trailingIconColor = MaterialTheme.colors.onSurface,
