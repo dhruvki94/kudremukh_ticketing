@@ -4,13 +4,13 @@ enum class VehicleType {
   TwoWheeler,
   LMV,
   HMV,
-  None;
+  Other;
 
   companion object {
     fun getByName(name: String?): VehicleType {
       VehicleType.values().forEach { type -> if (name == type.name) return type }
 
-      return None
+      return LMV
     }
 
     fun getOptions(): List<String> {
