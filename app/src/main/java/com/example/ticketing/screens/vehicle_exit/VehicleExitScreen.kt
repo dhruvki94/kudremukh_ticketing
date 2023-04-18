@@ -92,7 +92,7 @@ fun VehicleExitScreen(
               Text(
                 text = "ON TIME",
                 color = Color.Green,
-                fontSize = 48.sp,
+                fontSize = 35.sp,
                 fontWeight = FontWeight.Bold
               )
             }
@@ -100,7 +100,7 @@ fun VehicleExitScreen(
               Text(
                 text = "DELAYED",
                 color = Color.Red,
-                fontSize = 48.sp,
+                fontSize = 35.sp,
                 fontWeight = FontWeight.Bold
               )
             }
@@ -108,7 +108,7 @@ fun VehicleExitScreen(
               Text(
                 text = "OVER-SPEEDING",
                 color = Color.Red,
-                fontSize = 48.sp,
+                fontSize = 35.sp,
                 fontWeight = FontWeight.Bold
               )
             }
