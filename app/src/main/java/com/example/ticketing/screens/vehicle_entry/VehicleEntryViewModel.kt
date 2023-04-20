@@ -14,13 +14,20 @@ class VehicleEntryViewModel @Inject constructor(
   private val storageService: StorageService
 ) : ViewModel() {
   val vehicle = mutableStateOf(Vehicle())
+  val qrExists = mutableStateOf(false)
 
-  fun addQrCode(newValue: String) {
+  suspend fun onLaunchedEffect(newValue: String) {
+    storageService.getActiveVehicle(newValue)
+      ?.let {
+        qrExists.value = true
+        return
+      }
     vehicle.value = vehicle.value.copy(qrReference = newValue)
   }
 
-  fun onVehicleNumberChange(newValue: String) {
+  fun onVehicleNumberChange(newValue: String, vehicleDigits: String) {
     vehicle.value = vehicle.value.copy(vehicleNumber = newValue)
+    vehicle.value = vehicle.value.copy(vehicleDigits = vehicleDigits)
   }
 
   fun onDriverNameChange(newValue: String) {
@@ -38,15 +45,19 @@ class VehicleEntryViewModel @Inject constructor(
   fun onVehicleTypeChange(newValue: String) {
     vehicle.value = vehicle.value.copy(vehicleType = newValue)
   }
+
   fun onEntryGateChange(newValue: String) {
     vehicle.value = vehicle.value.copy(entryGate = newValue)
   }
+
   fun onExitGateChange(newValue: String) {
     vehicle.value = vehicle.value.copy(exitGate = newValue)
   }
+
   fun onTripTypeChange(newValue: String) {
     vehicle.value = vehicle.value.copy(tripType = newValue)
   }
+
   fun onDoneClick(popUpScreen: () -> Unit) {
     val updatedVehicle = vehicle.value.copy(entryTimestamp = System.currentTimeMillis())
     viewModelScope.launch {

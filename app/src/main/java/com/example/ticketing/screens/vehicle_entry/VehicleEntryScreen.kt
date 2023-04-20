@@ -11,7 +11,6 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -40,6 +39,7 @@ fun VehicleEntryScreen(
   navController: NavController
 ) {
   val vehicle by viewModel.vehicle
+  val qrExists by viewModel.qrExists
   val context = LocalContext.current
   val showVehicleNumberDialog = remember {
     mutableStateOf(false)
@@ -48,7 +48,32 @@ fun VehicleEntryScreen(
 
   //Add qrCode to vehicle's state
   LaunchedEffect(key1 = Unit) {
-    viewModel.addQrCode(qrCode)
+    viewModel.onLaunchedEffect(qrCode)
+  }
+
+  if (qrExists) {
+    val onDismiss = {
+      navController.navigate(TicketingScreens.Exit.name.plus("/$qrCode")) {
+        popUpTo(TicketingScreens.Main.name) {
+          inclusive = false
+        }
+      }
+    }
+    AlertDialog(
+      onDismissRequest = {
+        navController.popBackStack(
+          route = TicketingScreens.Main.name,
+          inclusive = false
+        )
+      },
+      dismissButton = {
+        TextButton(onClick = onDismiss) {
+          Text(text = "Go To Exit")
+        }
+      },
+      title = { Text(text = "This QR has Active Vehicle.\nPlease Exit that Vehicle.") },
+      confirmButton = {}
+    )
   }
 
   //Vehicle Number Stripped to Parts
@@ -72,7 +97,7 @@ fun VehicleEntryScreen(
   }
 
   SideEffect {
-    viewModel.onVehicleNumberChange(vehicleNumber.value)
+    viewModel.onVehicleNumberChange(vehicleNumber.value, vehicleNumberDigits)
   }
 
   //Alert Dialog to Inform that vehicle number is not entered
@@ -123,7 +148,7 @@ fun VehicleEntryScreen(
           .width(75.dp)
           .padding(8.dp, 4.dp),
         KeyboardOptions(
-          keyboardType = KeyboardType.Number,
+          keyboardType = KeyboardType.Text,
           imeAction = ImeAction.Next
         ),
         maxLength = 2,

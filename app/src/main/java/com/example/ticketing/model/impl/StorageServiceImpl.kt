@@ -2,13 +2,9 @@ package com.example.ticketing.model.impl
 
 import com.example.ticketing.model.Vehicle
 import com.example.ticketing.model.service.StorageService
-import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.ktx.snapshots
 import com.google.firebase.firestore.ktx.toObjects
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import java.util.*
 import javax.inject.Inject
@@ -18,18 +14,28 @@ class StorageServiceImpl
 constructor(
   private val firestore: FirebaseFirestore
 ) : StorageService {
-  override val vehicles: Flow<List<Vehicle>>
-    get() = activeCollection().snapshots().map { snapshot -> snapshot.toObjects() }
 
   override suspend fun getActiveVehicle(qrReference: String): Vehicle? {
     return activeCollection()
       .whereEqualTo("qrReference", qrReference)
       .orderBy("entryTimestamp", Query.Direction.DESCENDING)
+      .limit(1)
       .get()
       .await()
       .toObjects<Vehicle>()
       .firstOrNull()
   }
+
+
+  override suspend fun getActiveVehicleByVehicleDigits(vehicleDigits: String): List<Vehicle> {
+    return activeCollection()
+      .whereEqualTo("vehicleDigits", vehicleDigits)
+      .orderBy("entryTimestamp", Query.Direction.DESCENDING)
+      .get()
+      .await()
+      .toObjects<Vehicle>()
+  }
+
   override suspend fun getPastVehicle(uuid: UUID): Vehicle? =
     pastCollection()
       .whereEqualTo("uuid", uuid)
@@ -56,24 +62,6 @@ constructor(
   private fun activeCollection() = firestore.collection(ACTIVE_VEHICLES_COLLECTION)
 
   private fun pastCollection() = firestore.collection(PAST_VEHICLE_COLLECTION)
-
-  private fun vehicleMapper(doc: DocumentSnapshot) =
-    Vehicle(
-      id = doc.id,
-      uuid = doc.get("uuid").toString(),
-      qrReference = doc.get("qrReference").toString(),
-      vehicleNumber = doc.get("vehicleNumber").toString(),
-      driverName = doc.get("driverName").toString(),
-      driverMobile = doc.get("driverMobile").toString(),
-      noOfPassengers = doc.get("noOfPassengers").toString(),
-      vehicleType = doc.get("vehicleType").toString(),
-      entryGate = doc.get("entryGate").toString(),
-      exitGate = doc.get("exitGate").toString(),
-      tripType = doc.get("tripType").toString(),
-      entryTimestamp = doc.get("entryTimestamp").toString().toLong(),
-      exitTimestamp = doc.get("exitTimestamp").toString().toLong(),
-      status = doc.get("status").toString()
-    )
 
   companion object {
     private const val TAG = "StorageService"
