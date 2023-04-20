@@ -5,9 +5,10 @@ import kotlinx.coroutines.flow.Flow
 import java.util.UUID
 
 interface StorageService {
-  val vehicles: Flow<List<Vehicle>>
+//  val vehicles: Flow<List<Vehicle>>
 
   suspend fun getActiveVehicle(qrReference: String): Vehicle?
+  suspend fun getActiveVehicleByVehicleDigits(vehicleDigits: String): List<Vehicle>
   suspend fun getPastVehicle(uuid: UUID): Vehicle?
   suspend fun save(vehicle: Vehicle)
   suspend fun update(vehicle: Vehicle)

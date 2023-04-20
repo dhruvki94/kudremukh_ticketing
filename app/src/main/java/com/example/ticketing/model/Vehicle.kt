@@ -8,6 +8,7 @@ data class Vehicle(
   val uuid: String = UUID.randomUUID().toString(),
   val qrReference: String = "",
   val vehicleNumber: String = "",
+  val vehicleDigits: String = "",
   val driverName: String = "",
   val driverMobile: String = "",
   val noOfPassengers: String = "",

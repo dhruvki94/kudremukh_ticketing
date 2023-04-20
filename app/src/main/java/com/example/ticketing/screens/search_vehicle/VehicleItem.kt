@@ -17,7 +17,6 @@ fun VehicleItem(
   vehicle: Vehicle,
   onCardClick: (String) -> Unit,
   modifier: Modifier = Modifier,
-  sNo: Int
 ) {
   Card(
     modifier = Modifier
@@ -30,17 +29,6 @@ fun VehicleItem(
         .fillMaxWidth()
         .padding(12.dp)
     ) {
-      Column(modifier = Modifier.weight(0.3f)) {
-        Text(text = sNo.toString().plus('.'), style = MaterialTheme.typography.h6, textAlign = TextAlign.Center)
-      }
-      Spacer(modifier = modifier.width(3.dp))
-      Divider(
-        modifier = modifier
-          .fillMaxHeight()
-          .width(1.dp),
-        color = Color.DarkGray
-      )
-      Spacer(modifier = modifier.width(3.dp))
       Column(modifier = Modifier.weight(1f)) {
         Text(text = vehicle.vehicleNumber, style = MaterialTheme.typography.h6, textAlign = TextAlign.Center,)
       }
