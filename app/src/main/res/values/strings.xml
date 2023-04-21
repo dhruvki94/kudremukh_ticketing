@@ -28,4 +28,8 @@
     <string name="entry_camera">Entry Camera Screen</string>
     <string name="exit_camera">Exit Camera Screen</string>
     <string name="qr_code">QR Code</string>
+    <string name="phone_no">Phone Number</string>
+    <string name="otp">OTP</string>
+    <string name="login">Login Screen</string>
+    <string name="select_gate">Select Gate</string>
 </resources>

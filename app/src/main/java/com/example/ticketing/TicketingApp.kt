@@ -25,6 +25,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.ticketing.screens.CameraPreviewScreen
 import com.example.ticketing.screens.MainScreen
+import com.example.ticketing.screens.login.LoginScreen
 import com.example.ticketing.screens.scanner.ScannerScreen
 import com.example.ticketing.screens.search_vehicle.SearchVehicleScreen
 import com.example.ticketing.screens.vehicle_entry.VehicleEntryScreen
@@ -32,6 +33,7 @@ import com.example.ticketing.screens.vehicle_exit.VehicleExitScreen
 
 enum class TicketingScreens(@StringRes val title: Int) {
   Splash(R.string.splash),
+  Login(R.string.login),
   Main(R.string.main),
   EntryScanner(R.string.scanner),
   ExitScanner(R.string.scanner),
@@ -124,6 +126,10 @@ fun TicketingApp() {
           onExitButtonClicked = { navController.navigate(TicketingScreens.ExitScanner.name) },
           onSearchButtonClicked = { navController.navigate(TicketingScreens.Search.name) }
         )
+      }
+
+      composable(route = TicketingScreens.Login.name) {
+        LoginScreen()
       }
 
       composable(route = TicketingScreens.EntryScanner.name) {

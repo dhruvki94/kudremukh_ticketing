@@ -9,6 +9,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
+import com.example.ticketing.screens.login.LoginScreen
 import com.example.ticketing.ui.theme.TicketingTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -22,7 +23,8 @@ class MainActivity : ComponentActivity() {
       TicketingTheme {
         // A surface container using the 'background' color from the theme
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
-          TicketingApp()
+//          TicketingApp()
+          LoginScreen()
         }
       }
     }
