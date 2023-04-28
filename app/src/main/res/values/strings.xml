@@ -32,4 +32,6 @@
     <string name="otp">OTP</string>
     <string name="login">Login Screen</string>
     <string name="select_gate">Select Gate</string>
+    <string name="user">User Screen</string>
+    <string name="account_button">Account</string>
 </resources>

@@ -17,7 +17,6 @@ import com.example.ticketing.R
 import com.example.ticketing.common.BasicField
 import com.example.ticketing.common.DropdownSelector
 import com.example.ticketing.model.Gate
-import com.example.ticketing.model.Vehicle
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthProvider
@@ -45,93 +44,110 @@ fun LoginScreen(
     mutableStateOf("")
   }
 
-  Column(
-    modifier = Modifier.fillMaxSize(),
-    verticalArrangement = Arrangement.Center,
-    horizontalAlignment = Alignment.CenterHorizontally
-  ) {
-    BasicField(
-      text = R.string.phone_no,
-      value = phoneNumber,
-      keyboardOptions = KeyboardOptions(
-        keyboardType = KeyboardType.Number,
-        imeAction = ImeAction.Go
-      ),
-      maxLength = 10,
-      onNewValue = { viewModel.onPhoneNumberChange(it) })
+  var otpSent by remember {
+    mutableStateOf(false)
+  }
 
-    Spacer(modifier = Modifier.height(10.dp))
-
-    Button(
-      onClick = {
-        if (phoneNumber.isBlank()) {
-          Toast.makeText(context, "Please enter phone number..", Toast.LENGTH_SHORT)
-            .show()
-        } else {
-
-          // on below line calling method to generate verification code.
-          scope.launch {
-            viewModel.sendVerificationCode(context as Activity, callbacks)
-          }
-        }
-      },
-      // on below line we are
-      // adding modifier to our button.
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(16.dp)
+  if (!otpSent) {
+    Column(
+      modifier = Modifier.fillMaxSize(),
+      verticalArrangement = Arrangement.Center,
+      horizontalAlignment = Alignment.CenterHorizontally
     ) {
-      Text(text = "Generate OTP", modifier = Modifier.padding(8.dp))
+      BasicField(
+        text = R.string.phone_no,
+        value = phoneNumber,
+        keyboardOptions = KeyboardOptions(
+          keyboardType = KeyboardType.Number,
+          imeAction = ImeAction.Go
+        ),
+        maxLength = 10,
+        onNewValue = { viewModel.onPhoneNumberChange(it) })
+
+      Spacer(modifier = Modifier.height(10.dp))
+
+      GateCardSelector(gateSelected = gate, onValChange = viewModel::onGateChange)
+
+      Spacer(modifier = Modifier.height(10.dp))
+
+      Button(
+        onClick = {
+          if (phoneNumber.isBlank()) {
+            Toast.makeText(context, "Please enter phone number..", Toast.LENGTH_SHORT)
+              .show()
+          }
+          else if (gate.isBlank() || gate == "None") {
+            Toast.makeText(context, "Please select Gate..", Toast.LENGTH_SHORT)
+              .show()
+          }
+          else {
+            // on below line calling method to generate verification code.
+            scope.launch {
+              viewModel.sendVerificationCode(context as Activity, callbacks)
+            }
+          }
+        },
+        // on below line we are
+        // adding modifier to our button.
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(16.dp)
+      ) {
+        Text(text = "Generate OTP", modifier = Modifier.padding(8.dp))
+      }
     }
-
-    Spacer(modifier = Modifier.height(10.dp))
-
-    GateCardSelector(gateSelected = gate, onValChange = { viewModel.onGateChange(it) })
-
-    BasicField(
-      text = R.string.otp,
-      value = otp,
-      keyboardOptions = KeyboardOptions(
-        keyboardType = KeyboardType.Number,
-        imeAction = ImeAction.Done
-      ),
-      maxLength = 10,
-      onNewValue = { viewModel.onOtpChange(it) })
-
-    Spacer(modifier = Modifier.height(10.dp))
-
-    Button(
-      onClick = {
-        // on below line we are validating
-        // user input parameters.
-        if (otp.isBlank()) {
-          // displaying toast message on below line.
-          Toast.makeText(context, "Please enter otp..", Toast.LENGTH_SHORT)
-            .show()
-        } else {
-          // on below line generating phone credentials.
-          val credential: PhoneAuthCredential = PhoneAuthProvider.getCredential(
-            verificationID.value, otp
-          )
-          // on below line signing within credentials.
-          scope.launch {
-            viewModel.signInWithPhoneAuthCredential(
-              credential,
-              context as Activity,
-              context,
-              message
-            )
-          }
-        }
-      },
-      // on below line we are
-      // adding modifier to our button.
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(16.dp)
+  } else {
+    Column(
+      modifier = Modifier.fillMaxSize(),
+      verticalArrangement = Arrangement.Center,
+      horizontalAlignment = Alignment.CenterHorizontally
     ) {
-      // on below line we are adding text for our button
-      Text(text = "Verify OTP", modifier = Modifier.padding(8.dp))
+      BasicField(
+        text = R.string.otp,
+        value = otp,
+        keyboardOptions = KeyboardOptions(
+          keyboardType = KeyboardType.Number,
+          imeAction = ImeAction.Done
+        ),
+        maxLength = 10,
+        onNewValue = { viewModel.onOtpChange(it) })
+
+      Spacer(modifier = Modifier.height(10.dp))
+
+      Button(
+        onClick = {
+          // on below line we are validating
+          // user input parameters.
+          if (otp.isBlank()) {
+            // displaying toast message on below line.
+            Toast.makeText(context, "Please enter otp..", Toast.LENGTH_SHORT)
+              .show()
+          } else {
+            // on below line generating phone credentials.
+            val credential: PhoneAuthCredential = PhoneAuthProvider.getCredential(
+              verificationID.value, otp
+            )
+            // on below line signing within credentials.
+            scope.launch {
+              viewModel.signInWithPhoneAuthCredential(
+                credential,
+                context as Activity,
+                context,
+                message,
+                onSuccessfulLogin
+              )
+            }
+          }
+        },
+        // on below line we are
+        // adding modifier to our button.
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(16.dp)
+      ) {
+        // on below line we are adding text for our button
+        Text(text = "Verify OTP", modifier = Modifier.padding(8.dp))
+      }
     }
   }
 
@@ -140,8 +156,7 @@ fun LoginScreen(
       // on below line updating message
       // and displaying toast message
       message.value = "Verification successful"
-      Toast.makeText(context, "Verification successful..", Toast.LENGTH_SHORT).show()
-      onSuccessfulLogin()
+      Toast.makeText(context, "Verification successful!", Toast.LENGTH_SHORT).show()
     }
 
     override fun onVerificationFailed(p0: FirebaseException) {
@@ -152,6 +167,7 @@ fun LoginScreen(
 
     override fun onCodeSent(verificationId: String, p1: PhoneAuthProvider.ForceResendingToken) {
       // this method is called when code is send
+      otpSent = true
       super.onCodeSent(verificationId, p1)
       verificationID.value = verificationId
     }

@@ -16,19 +16,15 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object ServiceModule {
   @Provides
-  @Singleton
   fun provideStorageService(impl: StorageServiceImpl): StorageService = impl
 
   @Provides
-  @Singleton
   fun provideAccountService(impl: AccountServiceImpl): AccountService = impl
 
   @Provides
-  @Singleton
   fun provideFirestore() = FirebaseFirestore.getInstance()
 
   @Provides
-  @Singleton
   fun provideFirebaseAuth() = FirebaseAuth.getInstance()
 
 }
