@@ -1,9 +1,11 @@
 package com.example.ticketing.model.impl
 
+import com.example.ticketing.model.User
 import com.example.ticketing.model.Vehicle
 import com.example.ticketing.model.service.StorageService
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.Source
 import com.google.firebase.firestore.ktx.toObjects
 import kotlinx.coroutines.tasks.await
 import java.util.*
@@ -59,13 +61,30 @@ constructor(
       ?.let { activeCollection().document(it.id).delete().await() }
   }
 
+  override suspend fun addUser(user: User) {
+    userCollection().document(user.phoneNumber).set(mapOf("gate" to user.gate)).await()
+  }
+
+  override suspend fun deleteUser(phoneNumber: String) {
+    userCollection().document(phoneNumber).delete().await()
+  }
+
+  override suspend fun getGate(phoneNumber: String): String {
+    return if(phoneNumber.isNotBlank())
+      userCollection().document(phoneNumber).get(Source.CACHE).await().getString("gate") ?: ""
+    else
+      ""
+  }
+
   private fun activeCollection() = firestore.collection(ACTIVE_VEHICLES_COLLECTION)
 
   private fun pastCollection() = firestore.collection(PAST_VEHICLE_COLLECTION)
 
+  private fun userCollection() = firestore.collection(USER_COLLECTION)
+
   companion object {
-    private const val TAG = "StorageService"
     private const val ACTIVE_VEHICLES_COLLECTION = "active_vehicles"
     private const val PAST_VEHICLE_COLLECTION = "all_vehicles"
+    private const val USER_COLLECTION = "users"
   }
 }

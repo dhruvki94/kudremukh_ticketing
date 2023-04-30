@@ -22,7 +22,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.roundToInt
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun VehicleExitScreen(
   modifier: Modifier = Modifier,
@@ -36,7 +35,8 @@ fun VehicleExitScreen(
   }
   val timeFormat = SimpleDateFormat("HH:mm")
   val scope = rememberCoroutineScope()
-  LaunchedEffect(key1 = Unit) {
+
+  LaunchedEffect(key1 = Unit ) {
     viewModel.fetchByQr(qrReference)
   }
 
@@ -57,7 +57,7 @@ fun VehicleExitScreen(
     )
   }
 
-  if (vehicle.id.isBlank()) {
+  if (vehicle.id.isBlank() || vehicle.status.isBlank()) {
     Column(
       modifier = modifier.fillMaxSize(),
       verticalArrangement = Arrangement.Center,
@@ -70,7 +70,7 @@ fun VehicleExitScreen(
       )
     }
   } else {
-    if (vehicle.status.isBlank()) {
+    if (vehicle.vehicleNumber.isBlank()) {
       AlertDialog(
         onDismissRequest = { navController.popBackStack() },
         title = { Text(text = "Please go back and try again.") },

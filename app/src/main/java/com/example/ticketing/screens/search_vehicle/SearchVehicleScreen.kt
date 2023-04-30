@@ -75,7 +75,7 @@ fun SearchVehicleScreen(
     }
     Spacer(modifier = modifier.height(10.dp))
 
-    LazyColumn() {
+    LazyColumn {
       items(
         vehicles,
         key = null
