@@ -21,14 +21,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.ticketing.R
 import com.example.ticketing.TicketingScreens
-import com.example.ticketing.R.string as AppText
 import com.example.ticketing.common.BasicField
 import com.example.ticketing.common.DropdownSelector
-import com.example.ticketing.model.Gate
 import com.example.ticketing.model.TripType
 import com.example.ticketing.model.Vehicle
 import com.example.ticketing.model.VehicleType
 import kotlinx.coroutines.launch
+import com.example.ticketing.R.string as AppText
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -48,6 +47,10 @@ fun VehicleEntryScreen(
 
   //Add qrCode to vehicle's state
   LaunchedEffect(key1 = Unit) {
+    if(qrCode.isBlank()) {
+      Toast.makeText(context, "QR Code not Scanned Properly", Toast.LENGTH_LONG).show()
+      navController.popBackStack(route = TicketingScreens.EntryScanner.name, inclusive = false)
+    }
     viewModel.onLaunchedEffect(qrCode)
   }
 
@@ -148,7 +151,7 @@ fun VehicleEntryScreen(
           .width(75.dp)
           .padding(8.dp, 4.dp),
         KeyboardOptions(
-          keyboardType = KeyboardType.Text,
+          capitalization = KeyboardCapitalization.Characters,
           imeAction = ImeAction.Next
         ),
         maxLength = 2,
@@ -241,14 +244,6 @@ fun VehicleEntryScreen(
 
     Spacer(spacerModifier)
 
-    EntryGateCardSelector(vehicle = vehicle, onValChange = viewModel::onEntryGateChange)
-
-    Spacer(spacerModifier)
-
-    ExitGateCardSelector(vehicle = vehicle, onValChange = viewModel::onExitGateChange)
-
-    Spacer(spacerModifier)
-
     VehicleTypeCardSelector(vehicle = vehicle, onValChange = viewModel::onVehicleTypeChange)
 
     Spacer(spacerModifier)
@@ -282,58 +277,6 @@ fun VehicleEntryScreen(
     }
   }
 
-}
-
-@Composable
-@ExperimentalMaterialApi
-private fun EntryGateCardSelector(
-  vehicle: Vehicle,
-  onValChange: (String) -> Unit,
-  modifier: Modifier = Modifier
-) {
-  val currentSelection = Gate.getByName(vehicle.entryGate).name
-  Card(backgroundColor = MaterialTheme.colors.onPrimary, modifier = modifier) {
-    DropdownSelector(
-      R.string.entry_gate,
-      Gate.getOptions(),
-      currentSelection,
-      Modifier,
-      onValChange
-    )
-  }
-}
-
-@Composable
-@ExperimentalMaterialApi
-private fun ExitGateCardSelector(
-  vehicle: Vehicle,
-  onValChange: (String) -> Unit,
-  modifier: Modifier = Modifier
-) {
-  if (vehicle.entryGate != Gate.Kattinahole.name) {
-    val currentSelection = Gate.getByName(vehicle.exitGate).name
-    Card(backgroundColor = MaterialTheme.colors.onPrimary, modifier = modifier) {
-      DropdownSelector(
-        R.string.exit_gate,
-        Gate.getOptions().filterNot { it == Gate.Kattinahole.name || it == vehicle.entryGate },
-        currentSelection,
-        Modifier,
-        onValChange
-      )
-    }
-  } else {
-    onValChange(Gate.Kattinahole.name)
-    val currentSelection = Gate.getByName(vehicle.exitGate).name
-    Card(backgroundColor = MaterialTheme.colors.onPrimary, modifier = modifier) {
-      DropdownSelector(
-        R.string.exit_gate,
-        Gate.getOptions().filter { it == Gate.Kattinahole.name },
-        currentSelection,
-        Modifier,
-        onValChange
-      )
-    }
-  }
 }
 
 @Composable

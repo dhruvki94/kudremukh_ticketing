@@ -19,5 +19,7 @@ data class Vehicle(
   val entryTimestamp: Long = System.currentTimeMillis(),
   val exitTimestamp: Long? = null,
   val status:  String = "",
-  val exemptRemark: String = ""
+  val exemptRemark: String = "",
+  val entryMobile: String = "",
+  val exitMobile: String = ""
 )

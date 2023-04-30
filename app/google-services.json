@@ -14,34 +14,13 @@
       },
       "oauth_client": [
         {
-          "client_id": "612304724713-h4212f8pm45a1335plldp1cds19j41cu.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAp2dmJ3YUJCv6u35ltxKDhHzHrOJyXT7o"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "612304724713-h4212f8pm45a1335plldp1cds19j41cu.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:612304724713:android:631e405c842d7254328678",
-        "android_client_info": {
-          "package_name": "com.example.vehiclesticketing"
-        }
-      },
-      "oauth_client": [
+          "client_id": "612304724713-7cukiv017bvgcjjanvj1up5bfel4ksop.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ticketing",
+            "certificate_hash": "eea87360debd0e081adfa37eead2dcb2ae772fb7"
+          }
+        },
         {
           "client_id": "612304724713-h4212f8pm45a1335plldp1cds19j41cu.apps.googleusercontent.com",
           "client_type": 3
