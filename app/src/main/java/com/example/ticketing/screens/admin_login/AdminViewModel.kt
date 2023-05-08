@@ -1,4 +1,4 @@
-package com.example.ticketing.screens.login
+package com.example.ticketing.screens.admin_login
 
 import android.app.Activity
 import android.content.Context
@@ -19,12 +19,13 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class LoginViewModel
+class AdminViewModel
 @Inject
 constructor(
   private val accountService: AccountService,
   private val storageService: StorageService
 ) : ViewModel() {
+  val admins = storageService.admins
   val phoneNumber = mutableStateOf("")
   val otp = mutableStateOf("")
   val gate = mutableStateOf("")
@@ -48,7 +49,7 @@ constructor(
           User(
             phoneNumber = "+91${phoneNumber.value}",
             gate = gate.value,
-            role = UserRole.User.name
+            role = UserRole.Admin.name
           )
         )
     }
@@ -93,3 +94,4 @@ constructor(
       }
   }
 }
+

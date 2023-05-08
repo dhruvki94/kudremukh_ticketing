@@ -1,4 +1,4 @@
-package com.example.ticketing.screens.login
+package com.example.ticketing.screens.admin_login
 
 import android.app.Activity
 import android.widget.Toast
@@ -8,15 +8,13 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.ticketing.R
-import com.example.ticketing.TicketingScreens
 import com.example.ticketing.common.BasicField
 import com.example.ticketing.common.DropdownSelector
 import com.example.ticketing.model.Gate
@@ -27,15 +25,15 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun LoginScreen(
-  viewModel: LoginViewModel = hiltViewModel(),
-  onSuccessfulLogin: () -> Unit,
-  navController: NavController
-) {
+fun AdminScreen(
+  viewModel: AdminViewModel = hiltViewModel(),
+  onSuccessfulLogin: () -> Unit
+  ) {
   val context = LocalContext.current
   lateinit var callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks
   val scope = rememberCoroutineScope()
 
+  val admins = viewModel.admins.collectAsStateWithLifecycle(initialValue = emptyList())
   val phoneNumber by viewModel.phoneNumber
   val otp by viewModel.otp
   val gate by viewModel.gate
@@ -79,9 +77,11 @@ fun LoginScreen(
           if (phoneNumber.isBlank()) {
             Toast.makeText(context, "Please enter phone number..", Toast.LENGTH_LONG)
               .show()
-          }
-          else if (gate.isBlank() || gate == "None") {
+          } else if (gate.isBlank() || gate == "None") {
             Toast.makeText(context, "Please select Gate..", Toast.LENGTH_LONG)
+              .show()
+          } else if ("+91$phoneNumber" !in admins.value.toSet()) {
+            Toast.makeText(context, "You are not an admin", Toast.LENGTH_LONG)
               .show()
           }
           else {
@@ -98,14 +98,6 @@ fun LoginScreen(
           .padding(16.dp)
       ) {
         Text(text = "Generate OTP", modifier = Modifier.padding(8.dp))
-      }
-
-      Spacer(modifier = Modifier.height(10.dp))
-      Divider(thickness = 1.dp, color = Color.LightGray)
-      Spacer(modifier = Modifier.height(10.dp))
-
-      Button(onClick = { navController.navigate(route = TicketingScreens.Admin.name) }) {
-        Text(text = "Admin Login")
       }
     }
   } else {
@@ -204,3 +196,4 @@ private fun GateCardSelector(
     )
   }
 }
+

@@ -35,9 +35,12 @@ fun VehicleExitScreen(
   }
   val timeFormat = SimpleDateFormat("HH:mm")
   val scope = rememberCoroutineScope()
+  val previousScreen = navController.previousBackStackEntry?.destination?.route
 
   LaunchedEffect(key1 = Unit ) {
-    viewModel.fetchByQr(qrReference)
+    viewModel.getConfig()
+    viewModel.fetchByQr(qrReference, previousScreen == TicketingScreens.Search.name)
+    viewModel.update()
   }
 
   if (showDialog.value) {

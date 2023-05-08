@@ -6,15 +6,18 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.ticketing.common.composable.ConfirmDialog
+import com.example.ticketing.model.UserRole
 import kotlinx.coroutines.launch
 
 @Composable
@@ -23,7 +26,7 @@ fun UserScreen(
   restartApp: () -> Unit
 ) {
   val phoneNumber by viewModel.currentUserPhone.collectAsState(initial = "")
-  val gate by viewModel.gate
+  val userRecord by viewModel.userRecord
   val scope = rememberCoroutineScope()
 
   val showDialog = remember {
@@ -31,7 +34,7 @@ fun UserScreen(
   }
 
   LaunchedEffect(key1 = Unit) {
-    viewModel.getGate()
+    viewModel.getUserRecord()
   }
 
   if (showDialog.value) {
@@ -58,12 +61,28 @@ fun UserScreen(
       verticalArrangement = Arrangement.Center,
       modifier = Modifier.fillMaxSize()
     ) {
+      if (userRecord.role == UserRole.Admin.name) {
+        Spacer(modifier = spacerModifier)
+        Icon(imageVector = Icons.Filled.AccountBox, contentDescription = "account")
+        Spacer(modifier = spacerModifier)
+        Text(text = "Admin Account", style = MaterialTheme.typography.h4, textAlign = TextAlign.Center, color = Color(115, 20, 6),)
+        Spacer(modifier = spacerModifier)
+      } else {
+        Spacer(modifier = spacerModifier)
+        Icon(imageVector = Icons.Filled.AccountCircle, contentDescription = "account")
+        Spacer(modifier = spacerModifier)
+      }
+      Text(
+        text = "Mobile: $phoneNumber",
+        style = MaterialTheme.typography.h4,
+        textAlign = TextAlign.Center
+      )
       Spacer(modifier = spacerModifier)
-      Icon(imageVector = Icons.Filled.AccountCircle, contentDescription = "account")
-      Spacer(modifier = spacerModifier)
-      Text(text = "Mobile: $phoneNumber", style = MaterialTheme.typography.h4, textAlign = TextAlign.Center)
-      Spacer(modifier = spacerModifier)
-      Text(text = "Gate: $gate", style = MaterialTheme.typography.h4, textAlign = TextAlign.Center)
+      Text(
+        text = "Gate: ${userRecord.gate}",
+        style = MaterialTheme.typography.h4,
+        textAlign = TextAlign.Center
+      )
       Spacer(modifier = spacerModifier)
       Button(
         onClick = { showDialog.value = true }, modifier = Modifier
@@ -73,14 +92,17 @@ fun UserScreen(
         Text(text = "Sign Out", fontSize = 25.sp)
       }
     }
-  }
-  else {
+  } else {
     Column(
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Center,
       modifier = Modifier.fillMaxSize()
     ) {
-      Text(text = "Could not find User", style = MaterialTheme.typography.h5, textAlign = TextAlign.Center)
+      Text(
+        text = "Could not find User",
+        style = MaterialTheme.typography.h5,
+        textAlign = TextAlign.Center
+      )
       Spacer(modifier = spacerModifier)
       Button(
         onClick = { restartApp() }, modifier = Modifier
