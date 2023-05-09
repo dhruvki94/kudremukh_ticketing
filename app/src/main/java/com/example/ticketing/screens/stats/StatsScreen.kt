@@ -113,7 +113,7 @@ fun StatsScreen(
       Text(text = "Get Stats")
     }
     Spacer(modifier = modifier.height(25.dp))
-    if (finedVehicles.isNotEmpty() && enteredCount.isNotBlank()) {
+    if (finedVehicles.isNotEmpty() || enteredCount.isNotBlank()) {
       TextRow(key = "Total Vehicles Entered", value = enteredCount)
       Spacer(modifier = modifier.height(10.dp))
       TextRow(key = "Total Delayed", value = finedVehicles.count { it.status == VehicleStatus.Delayed.name }

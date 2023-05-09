@@ -19,8 +19,10 @@ constructor(
 ) : ViewModel() {
   val vehicle = mutableStateOf(Vehicle())
   val gate = mutableStateOf("")
+  val pastVehicle = mutableStateOf(Vehicle())
   private val phone = mutableStateOf("")
   private val config = mutableStateOf(VehicleConfig())
+
 
   init {
     viewModelScope.launch {
@@ -39,22 +41,37 @@ constructor(
     viewModelScope.launch {
       vehicle.value = storageService.getActiveVehicle(qrReference)
         ?: Vehicle()
-      vehicle.value = vehicle.value.copy(exitTimestamp = System.currentTimeMillis())
 
-      vehicle.value = vehicle.value.copy(exitMobile = phone.value)
+      vehicle.value = vehicle.value.copy(
+        exitTimestamp = System.currentTimeMillis(),
+        exitMobile = phone.value,
+        exitGate = gate.value,
+        cardLost = isCardLost
+      )
 
-      vehicle.value = vehicle.value.copy(exitGate = gate.value)
 
-      vehicle.value = vehicle.value.copy(cardLost = isCardLost)
       calculateTime()
       calculateFine()
+
+      pastVehicle.value = storageService.getPastVehicle(vehicle.value.uuid)
+        ?: Vehicle()
+      pastVehicle.value = pastVehicle.value.copy(
+        exitTimestamp = System.currentTimeMillis(),
+        exitMobile = phone.value,
+        exitGate = gate.value,
+        cardLost = isCardLost,
+        status = vehicle.value.status,
+        fined = vehicle.value.fined,
+        totalFineLevied = vehicle.value.totalFineLevied
+      )
     }
   }
 
   fun update() {
     viewModelScope.launch {
-      if (vehicle.value.id.isNotBlank())
-        storageService.update(vehicle.value)
+      println("Vehicle ID: ${pastVehicle.value}")
+      if (pastVehicle.value.id.isNotBlank())
+        storageService.update(pastVehicle.value)
     }
   }
 
@@ -62,9 +79,9 @@ constructor(
     vehicle.value = vehicle.value.copy(exemptRemark = remark)
   }
 
-  fun onFinishButtonClick(popUpScreen: () -> Unit) {
+  suspend fun onFinishButtonClick(popUpScreen: () -> Unit) {
     viewModelScope.launch {
-      storageService.update(vehicle.value)
+      storageService.update(pastVehicle.value)
       storageService.delete(vehicle.value.qrReference)
     }
     popUpScreen()
@@ -82,33 +99,49 @@ constructor(
       if (vehicle.value.entryGate in malaAndTanikod && vehicle.value.exitGate in malaAndTanikod) {
         minutesTaken.let {
           when {
-            it < (config.value.twoWheeler.minTime["MalaTanikod"]?.toLong() ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.OverSped.name)
-            it in (config.value.twoWheeler.minTime["MalaTanikod"]?.toLong() ?: -1)..(config.value.twoWheeler.maxTime["MalaTanikod"]?.toLong() ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.OnTime.name)
-            it > (config.value.twoWheeler.maxTime["MalaTanikod"]?.toLong() ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.Delayed.name)
+            it < (config.value.twoWheeler.minTime["MalaTanikod"]?.toLong() ?: -1) -> vehicle.value =
+              vehicle.value.copy(status = VehicleStatus.OverSped.name)
+            it in (config.value.twoWheeler.minTime["MalaTanikod"]?.toLong()
+              ?: -1)..(config.value.twoWheeler.maxTime["MalaTanikod"]?.toLong()
+              ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.OnTime.name)
+            it > (config.value.twoWheeler.maxTime["MalaTanikod"]?.toLong() ?: -1) -> vehicle.value =
+              vehicle.value.copy(status = VehicleStatus.Delayed.name)
           }
         }
       } else if (vehicle.value.entryGate in malaAndBasrikal && vehicle.value.exitGate in malaAndBasrikal) {
         minutesTaken.let {
           when {
-            it < (config.value.twoWheeler.minTime["MalaBasrikal"]?.toLong() ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.OverSped.name)
-            it in (config.value.twoWheeler.minTime["MalaBasrikal"]?.toLong() ?: -1)..(config.value.twoWheeler.maxTime["MalaBasrikal"]?.toLong() ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.OnTime.name)
-            it > (config.value.twoWheeler.maxTime["MalaBasrikal"]?.toLong() ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.Delayed.name)
+            it < (config.value.twoWheeler.minTime["MalaBasrikal"]?.toLong()
+              ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.OverSped.name)
+            it in (config.value.twoWheeler.minTime["MalaBasrikal"]?.toLong()
+              ?: -1)..(config.value.twoWheeler.maxTime["MalaBasrikal"]?.toLong()
+              ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.OnTime.name)
+            it > (config.value.twoWheeler.maxTime["MalaBasrikal"]?.toLong()
+              ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.Delayed.name)
           }
         }
       } else if (vehicle.value.entryGate in tanikodAndBasrikal && vehicle.value.exitGate in tanikodAndBasrikal) {
         minutesTaken.let {
           when {
-            it < (config.value.twoWheeler.minTime["TanikodBasrikal"]?.toLong() ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.OverSped.name)
-            it in (config.value.twoWheeler.minTime["TanikodBasrikal"]?.toLong() ?: -1)..(config.value.twoWheeler.maxTime["TanikodBasrikal"]?.toLong() ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.OnTime.name)
-            it > (config.value.twoWheeler.maxTime["TanikodBasrikal"]?.toLong() ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.Delayed.name)
+            it < (config.value.twoWheeler.minTime["TanikodBasrikal"]?.toLong()
+              ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.OverSped.name)
+            it in (config.value.twoWheeler.minTime["TanikodBasrikal"]?.toLong()
+              ?: -1)..(config.value.twoWheeler.maxTime["TanikodBasrikal"]?.toLong()
+              ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.OnTime.name)
+            it > (config.value.twoWheeler.maxTime["TanikodBasrikal"]?.toLong()
+              ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.Delayed.name)
           }
         }
       } else {
         minutesTaken.let {
           when {
-            it < (config.value.twoWheeler.minTime["Kattinahole"]?.toLong() ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.OverSped.name)
-            it in (config.value.twoWheeler.minTime["Kattinahole"]?.toLong() ?: -1)..(config.value.twoWheeler.maxTime["Kattinahole"]?.toLong() ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.OnTime.name)
-            it > (config.value.twoWheeler.maxTime["Kattinahole"]?.toLong() ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.Delayed.name)
+            it < (config.value.twoWheeler.minTime["Kattinahole"]?.toLong() ?: -1) -> vehicle.value =
+              vehicle.value.copy(status = VehicleStatus.OverSped.name)
+            it in (config.value.twoWheeler.minTime["Kattinahole"]?.toLong()
+              ?: -1)..(config.value.twoWheeler.maxTime["Kattinahole"]?.toLong()
+              ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.OnTime.name)
+            it > (config.value.twoWheeler.maxTime["Kattinahole"]?.toLong() ?: -1) -> vehicle.value =
+              vehicle.value.copy(status = VehicleStatus.Delayed.name)
           }
         }
       }
@@ -116,33 +149,49 @@ constructor(
       if (vehicle.value.entryGate in malaAndTanikod && vehicle.value.exitGate in malaAndTanikod) {
         minutesTaken.let {
           when {
-            it < (config.value.lmv.minTime["MalaTanikod"]?.toLong() ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.OverSped.name)
-            it in (config.value.lmv.minTime["MalaTanikod"]?.toLong() ?: -1)..(config.value.lmv.maxTime["MalaTanikod"]?.toLong() ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.OnTime.name)
-            it > (config.value.lmv.maxTime["MalaTanikod"]?.toLong() ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.Delayed.name)
+            it < (config.value.lmv.minTime["MalaTanikod"]?.toLong() ?: -1) -> vehicle.value =
+              vehicle.value.copy(status = VehicleStatus.OverSped.name)
+            it in (config.value.lmv.minTime["MalaTanikod"]?.toLong()
+              ?: -1)..(config.value.lmv.maxTime["MalaTanikod"]?.toLong() ?: -1) -> vehicle.value =
+              vehicle.value.copy(status = VehicleStatus.OnTime.name)
+            it > (config.value.lmv.maxTime["MalaTanikod"]?.toLong() ?: -1) -> vehicle.value =
+              vehicle.value.copy(status = VehicleStatus.Delayed.name)
           }
         }
       } else if (vehicle.value.entryGate in malaAndBasrikal && vehicle.value.exitGate in malaAndBasrikal) {
         minutesTaken.let {
           when {
-            it < (config.value.lmv.minTime["MalaBasrikal"]?.toLong() ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.OverSped.name)
-            it in (config.value.lmv.minTime["MalaBasrikal"]?.toLong() ?: -1)..(config.value.lmv.maxTime["MalaBasrikal"]?.toLong() ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.OnTime.name)
-            it > (config.value.lmv.maxTime["MalaBasrikal"]?.toLong() ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.Delayed.name)
+            it < (config.value.lmv.minTime["MalaBasrikal"]?.toLong() ?: -1) -> vehicle.value =
+              vehicle.value.copy(status = VehicleStatus.OverSped.name)
+            it in (config.value.lmv.minTime["MalaBasrikal"]?.toLong()
+              ?: -1)..(config.value.lmv.maxTime["MalaBasrikal"]?.toLong() ?: -1) -> vehicle.value =
+              vehicle.value.copy(status = VehicleStatus.OnTime.name)
+            it > (config.value.lmv.maxTime["MalaBasrikal"]?.toLong() ?: -1) -> vehicle.value =
+              vehicle.value.copy(status = VehicleStatus.Delayed.name)
           }
         }
       } else if (vehicle.value.entryGate in tanikodAndBasrikal && vehicle.value.exitGate in tanikodAndBasrikal) {
         minutesTaken.let {
           when {
-            it < (config.value.lmv.minTime["TanikodBasrikal"]?.toLong() ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.OverSped.name)
-            it in (config.value.lmv.minTime["TanikodBasrikal"]?.toLong() ?: -1)..(config.value.lmv.maxTime["TanikodBasrikal"]?.toLong() ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.OnTime.name)
-            it > (config.value.lmv.maxTime["TanikodBasrikal"]?.toLong() ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.Delayed.name)
+            it < (config.value.lmv.minTime["TanikodBasrikal"]?.toLong() ?: -1) -> vehicle.value =
+              vehicle.value.copy(status = VehicleStatus.OverSped.name)
+            it in (config.value.lmv.minTime["TanikodBasrikal"]?.toLong()
+              ?: -1)..(config.value.lmv.maxTime["TanikodBasrikal"]?.toLong()
+              ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.OnTime.name)
+            it > (config.value.lmv.maxTime["TanikodBasrikal"]?.toLong() ?: -1) -> vehicle.value =
+              vehicle.value.copy(status = VehicleStatus.Delayed.name)
           }
         }
       } else {
         minutesTaken.let {
           when {
-            it < (config.value.lmv.minTime["Kattinahole"]?.toLong() ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.OverSped.name)
-            it in (config.value.lmv.minTime["Kattinahole"]?.toLong() ?: -1)..(config.value.lmv.maxTime["Kattinahole"]?.toLong() ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.OnTime.name)
-            it > (config.value.lmv.maxTime["Kattinahole"]?.toLong() ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.Delayed.name)
+            it < (config.value.lmv.minTime["Kattinahole"]?.toLong() ?: -1) -> vehicle.value =
+              vehicle.value.copy(status = VehicleStatus.OverSped.name)
+            it in (config.value.lmv.minTime["Kattinahole"]?.toLong()
+              ?: -1)..(config.value.lmv.maxTime["Kattinahole"]?.toLong() ?: -1) -> vehicle.value =
+              vehicle.value.copy(status = VehicleStatus.OnTime.name)
+            it > (config.value.lmv.maxTime["Kattinahole"]?.toLong() ?: -1) -> vehicle.value =
+              vehicle.value.copy(status = VehicleStatus.Delayed.name)
           }
         }
       }
@@ -150,33 +199,49 @@ constructor(
       if (vehicle.value.entryGate in malaAndTanikod && vehicle.value.exitGate in malaAndTanikod) {
         minutesTaken.let {
           when {
-            it < (config.value.hmv.minTime["MalaTanikod"]?.toLong() ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.OverSped.name)
-            it in (config.value.hmv.minTime["MalaTanikod"]?.toLong() ?: -1)..(config.value.hmv.maxTime["MalaTanikod"]?.toLong() ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.OnTime.name)
-            it > (config.value.hmv.maxTime["MalaTanikod"]?.toLong() ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.Delayed.name)
+            it < (config.value.hmv.minTime["MalaTanikod"]?.toLong() ?: -1) -> vehicle.value =
+              vehicle.value.copy(status = VehicleStatus.OverSped.name)
+            it in (config.value.hmv.minTime["MalaTanikod"]?.toLong()
+              ?: -1)..(config.value.hmv.maxTime["MalaTanikod"]?.toLong() ?: -1) -> vehicle.value =
+              vehicle.value.copy(status = VehicleStatus.OnTime.name)
+            it > (config.value.hmv.maxTime["MalaTanikod"]?.toLong() ?: -1) -> vehicle.value =
+              vehicle.value.copy(status = VehicleStatus.Delayed.name)
           }
         }
       } else if (vehicle.value.entryGate in malaAndBasrikal && vehicle.value.exitGate in malaAndBasrikal) {
         minutesTaken.let {
           when {
-            it < (config.value.hmv.minTime["MalaBasrikal"]?.toLong() ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.OverSped.name)
-            it in (config.value.hmv.minTime["MalaBasrikal"]?.toLong() ?: -1)..(config.value.hmv.maxTime["MalaBasrikal"]?.toLong() ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.OnTime.name)
-            it > (config.value.hmv.maxTime["MalaBasrikal"]?.toLong() ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.Delayed.name)
+            it < (config.value.hmv.minTime["MalaBasrikal"]?.toLong() ?: -1) -> vehicle.value =
+              vehicle.value.copy(status = VehicleStatus.OverSped.name)
+            it in (config.value.hmv.minTime["MalaBasrikal"]?.toLong()
+              ?: -1)..(config.value.hmv.maxTime["MalaBasrikal"]?.toLong() ?: -1) -> vehicle.value =
+              vehicle.value.copy(status = VehicleStatus.OnTime.name)
+            it > (config.value.hmv.maxTime["MalaBasrikal"]?.toLong() ?: -1) -> vehicle.value =
+              vehicle.value.copy(status = VehicleStatus.Delayed.name)
           }
         }
       } else if (vehicle.value.entryGate in tanikodAndBasrikal && vehicle.value.exitGate in tanikodAndBasrikal) {
         minutesTaken.let {
           when {
-            it < (config.value.hmv.minTime["TanikodBasrikal"]?.toLong() ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.OverSped.name)
-            it in (config.value.hmv.minTime["TanikodBasrikal"]?.toLong() ?: -1)..(config.value.hmv.maxTime["TanikodBasrikal"]?.toLong() ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.OnTime.name)
-            it > (config.value.hmv.maxTime["TanikodBasrikal"]?.toLong() ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.Delayed.name)
+            it < (config.value.hmv.minTime["TanikodBasrikal"]?.toLong() ?: -1) -> vehicle.value =
+              vehicle.value.copy(status = VehicleStatus.OverSped.name)
+            it in (config.value.hmv.minTime["TanikodBasrikal"]?.toLong()
+              ?: -1)..(config.value.hmv.maxTime["TanikodBasrikal"]?.toLong()
+              ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.OnTime.name)
+            it > (config.value.hmv.maxTime["TanikodBasrikal"]?.toLong() ?: -1) -> vehicle.value =
+              vehicle.value.copy(status = VehicleStatus.Delayed.name)
           }
         }
       } else {
         minutesTaken.let {
           when {
-            it < (config.value.hmv.minTime["Kattinahole"]?.toLong() ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.OverSped.name)
-            it in (config.value.hmv.minTime["Kattinahole"]?.toLong() ?: -1)..(config.value.hmv.maxTime["Kattinahole"]?.toLong() ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.OnTime.name)
-            it > (config.value.hmv.maxTime["Kattinahole"]?.toLong() ?: -1) -> vehicle.value = vehicle.value.copy(status = VehicleStatus.Delayed.name)
+            it < (config.value.hmv.minTime["Kattinahole"]?.toLong() ?: -1) -> vehicle.value =
+              vehicle.value.copy(status = VehicleStatus.OverSped.name)
+            it in (config.value.hmv.minTime["Kattinahole"]?.toLong()
+              ?: -1)..(config.value.hmv.maxTime["Kattinahole"]?.toLong() ?: -1) -> vehicle.value =
+              vehicle.value.copy(status = VehicleStatus.OnTime.name)
+            it > (config.value.hmv.maxTime["Kattinahole"]?.toLong() ?: -1) -> vehicle.value =
+              vehicle.value.copy(status = VehicleStatus.Delayed.name)
           }
         }
       }
@@ -196,7 +261,7 @@ constructor(
       } else if (vehicle.value.cardLost == true) {
         vehicle.value = vehicle.value.copy(totalFineLevied = cardFine, fined = true)
       } else {
-        vehicle.value = vehicle.value.copy(fined = false)
+        vehicle.value = vehicle.value.copy(totalFineLevied = 0, fined = false)
       }
     } else if (vehicle.value.vehicleType == VehicleType.LMV.name) {
       val cardFine = config.value.lmv.cardFine
@@ -210,7 +275,7 @@ constructor(
       } else if (vehicle.value.cardLost == true) {
         vehicle.value = vehicle.value.copy(totalFineLevied = cardFine, fined = true)
       } else {
-        vehicle.value = vehicle.value.copy(fined = false)
+        vehicle.value = vehicle.value.copy(totalFineLevied = 0, fined = false)
       }
     } else {
       val cardFine = config.value.hmv.cardFine
@@ -224,7 +289,7 @@ constructor(
       } else if (vehicle.value.cardLost == true) {
         vehicle.value = vehicle.value.copy(totalFineLevied = cardFine, fined = true)
       } else {
-        vehicle.value = vehicle.value.copy(fined = false)
+        vehicle.value = vehicle.value.copy(totalFineLevied = 0, fined = false)
       }
     }
   }

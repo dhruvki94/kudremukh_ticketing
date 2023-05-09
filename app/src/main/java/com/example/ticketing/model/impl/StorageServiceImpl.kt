@@ -10,7 +10,6 @@ import com.google.firebase.firestore.ktx.toObjects
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
-import java.util.*
 import javax.inject.Inject
 
 class StorageServiceImpl
@@ -40,7 +39,6 @@ constructor(
       .firstOrNull()
   }
 
-
   override suspend fun getActiveVehicleByVehicleDigits(vehicleDigits: String): List<Vehicle> {
     return activeCollection()
       .whereEqualTo("vehicleDigits", vehicleDigits)
@@ -50,7 +48,7 @@ constructor(
       .toObjects()
   }
 
-  override suspend fun getPastVehicle(uuid: UUID): Vehicle? =
+  override suspend fun getPastVehicle(uuid: String): Vehicle? =
     pastCollection()
       .whereEqualTo("uuid", uuid)
       .orderBy("entryTimestamp", Query.Direction.DESCENDING)

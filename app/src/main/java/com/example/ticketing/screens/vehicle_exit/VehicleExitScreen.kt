@@ -30,6 +30,7 @@ fun VehicleExitScreen(
   navController: NavController
 ) {
   val vehicle by viewModel.vehicle
+  val pastVehicle by viewModel.pastVehicle
   val showDialog = remember {
     mutableStateOf(false)
   }
@@ -40,6 +41,8 @@ fun VehicleExitScreen(
   LaunchedEffect(key1 = Unit ) {
     viewModel.getConfig()
     viewModel.fetchByQr(qrReference, previousScreen == TicketingScreens.Search.name)
+  }
+  LaunchedEffect(key1 = pastVehicle) {
     viewModel.update()
   }
 
