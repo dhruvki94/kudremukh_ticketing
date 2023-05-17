@@ -3,6 +3,7 @@ package com.example.ticketing.screens.user
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ticketing.model.UserRecord
 import com.example.ticketing.model.service.AccountService
 import com.example.ticketing.model.service.StorageService
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,7 +18,7 @@ constructor(
   private val storage: StorageService
 ) : ViewModel() {
   val currentUserPhone = auth.currentUserPhone
-  val gate = mutableStateOf("")
+  val userRecord = mutableStateOf(UserRecord())
 
   fun onSignOut(currentUserPhone: String, restartApp: () -> Unit) {
     viewModelScope.launch {
@@ -27,11 +28,9 @@ constructor(
     }
   }
 
-  fun getGate(){
+  fun getUserRecord(){
     viewModelScope.launch {
-      currentUserPhone.collect {
-        gate.value = storage.getGate(phoneNumber = it)
-      }
+      userRecord.value = storage.getUserRecord()
     }
   }
 }

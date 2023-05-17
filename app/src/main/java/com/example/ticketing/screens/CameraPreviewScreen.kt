@@ -75,7 +75,6 @@ fun CameraPreviewScreen(
             }
 
           } catch (exc: Exception) {
-            println("DEBUG: Use case binding failed: $exc")
           }
         }, ContextCompat.getMainExecutor(context))
         previewView

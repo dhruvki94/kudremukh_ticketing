@@ -44,6 +44,10 @@ fun VehicleEntryScreen(
     mutableStateOf(false)
   }
   val scope = rememberCoroutineScope()
+  val showAlternateVehicleNumber = remember {
+    mutableStateOf(false)
+  }
+
 
   //Add qrCode to vehicle's state
   LaunchedEffect(key1 = Unit) {
@@ -99,8 +103,14 @@ fun VehicleEntryScreen(
     }
   }
 
+  //Alternate vehicle number
+  var alternateVehicleNumber by remember {
+    mutableStateOf("")
+  }
+
   SideEffect {
-    viewModel.onVehicleNumberChange(vehicleNumber.value, vehicleNumberDigits)
+    if(!showAlternateVehicleNumber.value)
+      viewModel.onVehicleNumberChange(vehicleNumber.value, vehicleNumberDigits)
   }
 
   //Alert Dialog to Inform that vehicle number is not entered
@@ -125,76 +135,105 @@ fun VehicleEntryScreen(
     Text(stringResource(id = AppText.vehicle_number), style = MaterialTheme.typography.body2)
     Spacer(modifier = modifier.height(2.dp))
     Row {
-      Spacer(modifier = modifier.width(1.dp))
-      BasicField(
-        AppText.text_placeholder_two,
-        vehicleNumberState,
-        { vehicleNumberState = it },
-        Modifier
-          .width(75.dp)
-          .padding(8.dp, 4.dp),
-        KeyboardOptions(
-          capitalization = KeyboardCapitalization.Characters,
-          imeAction = ImeAction.Next
-        ),
-        maxLength = 2,
-        focusManager = LocalFocusManager.current,
-        focusDirection = FocusDirection.Right,
-        textAlign = TextAlign.Center
-      )
-      Spacer(modifier = modifier.width(1.dp))
-      BasicField(
-        AppText.no_placeholder_two,
-        vehicleNumberDistrict,
-        { vehicleNumberDistrict = it },
-        Modifier
-          .width(75.dp)
-          .padding(8.dp, 4.dp),
-        KeyboardOptions(
-          capitalization = KeyboardCapitalization.Characters,
-          imeAction = ImeAction.Next
-        ),
-        maxLength = 2,
-        focusManager = LocalFocusManager.current,
-        focusDirection = FocusDirection.Right,
-        textAlign = TextAlign.Center
-      )
-      Spacer(modifier = modifier.width(1.dp))
-      BasicField(
-        AppText.text_placeholder_two,
-        vehicleNumberAlphabets,
-        { vehicleNumberAlphabets = it },
-        Modifier
-          .width(75.dp)
-          .padding(8.dp, 4.dp),
-        KeyboardOptions(
-          capitalization = KeyboardCapitalization.Characters,
-          imeAction = ImeAction.Next
-        ),
-        maxLength = 2,
-        focusManager = LocalFocusManager.current,
-        focusDirection = FocusDirection.Right,
-        textAlign = TextAlign.Center
-      )
-      Spacer(modifier = modifier.width(1.dp))
-      BasicField(
-        AppText.no_placeholder_four,
-        vehicleNumberDigits,
-        { vehicleNumberDigits = it },
-        Modifier
-          .width(100.dp)
-          .padding(8.dp, 4.dp),
-        KeyboardOptions(
-          keyboardType = KeyboardType.Number,
-          capitalization = KeyboardCapitalization.Characters,
-          imeAction = ImeAction.Next
-        ),
-        maxLength = 4,
-        focusManager = LocalFocusManager.current,
-        focusDirection = FocusDirection.Down,
-        textAlign = TextAlign.Center
-      )
-      Spacer(modifier = modifier.width(1.dp))
+      if(!showAlternateVehicleNumber.value) {
+        Spacer(modifier = modifier.width(1.dp))
+        Checkbox(
+          checked = showAlternateVehicleNumber.value,
+          onCheckedChange = { showAlternateVehicleNumber.value = it })
+        Spacer(modifier = modifier.height(2.dp))
+        BasicField(
+          AppText.text_placeholder_two,
+          vehicleNumberState,
+          { vehicleNumberState = it },
+          Modifier
+            .width(75.dp)
+            .padding(8.dp, 4.dp),
+          KeyboardOptions(
+            capitalization = KeyboardCapitalization.Characters,
+            imeAction = ImeAction.Next
+          ),
+          maxLength = 2,
+          focusManager = LocalFocusManager.current,
+          focusDirection = FocusDirection.Right,
+          textAlign = TextAlign.Center
+        )
+        Spacer(modifier = modifier.width(1.dp))
+        BasicField(
+          AppText.no_placeholder_two,
+          vehicleNumberDistrict,
+          { vehicleNumberDistrict = it },
+          Modifier
+            .width(75.dp)
+            .padding(8.dp, 4.dp),
+          KeyboardOptions(
+            capitalization = KeyboardCapitalization.Characters,
+            imeAction = ImeAction.Next
+          ),
+          maxLength = 2,
+          focusManager = LocalFocusManager.current,
+          focusDirection = FocusDirection.Right,
+          textAlign = TextAlign.Center
+        )
+        Spacer(modifier = modifier.width(1.dp))
+        BasicField(
+          AppText.text_placeholder_two,
+          vehicleNumberAlphabets,
+          { vehicleNumberAlphabets = it },
+          Modifier
+            .width(75.dp)
+            .padding(8.dp, 4.dp),
+          KeyboardOptions(
+            capitalization = KeyboardCapitalization.Characters,
+            imeAction = ImeAction.Next
+          ),
+          maxLength = 2,
+          focusManager = LocalFocusManager.current,
+          focusDirection = FocusDirection.Right,
+          textAlign = TextAlign.Center
+        )
+        Spacer(modifier = modifier.width(1.dp))
+        BasicField(
+          AppText.no_placeholder_four,
+          vehicleNumberDigits,
+          { vehicleNumberDigits = it },
+          Modifier
+            .width(100.dp)
+            .padding(8.dp, 4.dp),
+          KeyboardOptions(
+            keyboardType = KeyboardType.Number,
+            capitalization = KeyboardCapitalization.Characters,
+            imeAction = ImeAction.Next
+          ),
+          maxLength = 4,
+          focusManager = LocalFocusManager.current,
+          focusDirection = FocusDirection.Down,
+          textAlign = TextAlign.Center
+        )
+        Spacer(modifier = modifier.width(1.dp))
+      } else {
+        Spacer(modifier = modifier.width(1.dp))
+        Checkbox(
+          checked = showAlternateVehicleNumber.value,
+          onCheckedChange = { showAlternateVehicleNumber.value = it })
+        Spacer(modifier = modifier.height(2.dp))
+        BasicField(
+          AppText.vehicle_number,
+          alternateVehicleNumber,
+          {
+            alternateVehicleNumber = it
+            viewModel.onVehicleNumberChange(newValue = it, vehicleDigits = it.takeLast(4))
+          },
+          Modifier
+            .width(300.dp)
+            .padding(8.dp, 4.dp),
+          KeyboardOptions(
+            capitalization = KeyboardCapitalization.Characters,
+            imeAction = ImeAction.Next
+          ),
+          textAlign = TextAlign.Center
+        )
+        Spacer(modifier = modifier.width(1.dp))
+      }
     }
 
     Spacer(spacerModifier)

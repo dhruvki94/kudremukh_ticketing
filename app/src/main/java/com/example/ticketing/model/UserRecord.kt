@@ -1,7 +1,6 @@
 package com.example.ticketing.model
 
-data class User(
-  val phoneNumber: String = "",
+data class UserRecord(
   val gate: String = "",
   val role: String = ""
 )

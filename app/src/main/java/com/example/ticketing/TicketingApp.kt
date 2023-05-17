@@ -24,11 +24,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.ticketing.screens.CameraPreviewScreen
-import com.example.ticketing.screens.MainScreen
+import com.example.ticketing.screens.main.MainScreen
+import com.example.ticketing.screens.admin_login.AdminScreen
 import com.example.ticketing.screens.login.LoginScreen
 import com.example.ticketing.screens.scanner.ScannerScreen
 import com.example.ticketing.screens.search_vehicle.SearchVehicleScreen
 import com.example.ticketing.screens.splash.SplashScreen
+import com.example.ticketing.screens.stats.StatsScreen
 import com.example.ticketing.screens.user.UserScreen
 import com.example.ticketing.screens.vehicle_entry.VehicleEntryScreen
 import com.example.ticketing.screens.vehicle_exit.VehicleExitScreen
@@ -36,6 +38,7 @@ import com.example.ticketing.screens.vehicle_exit.VehicleExitScreen
 enum class TicketingScreens(@StringRes val title: Int) {
   Splash(R.string.splash),
   Login(R.string.login),
+  Admin(R.string.admin_screen),
   Main(R.string.main),
   User(R.string.user),
   EntryScanner(R.string.scanner),
@@ -44,7 +47,8 @@ enum class TicketingScreens(@StringRes val title: Int) {
   Exit(R.string.exit),
   Search(R.string.search_screen),
   EntryCamera(R.string.entry_camera),
-  ExitCamera(R.string.entry_camera)
+  ExitCamera(R.string.entry_camera),
+  Stats(R.string.stats)
 }
 
 @Composable
@@ -126,7 +130,8 @@ fun TicketingApp() {
         isHomeScreen = navController.currentBackStackEntryAsState().value?.destination?.route?.substringBefore(
           '/'
         ) == TicketingScreens.Main.name,
-        navigateToHome = { navController.navigate(TicketingScreens.Main.name) },
+        navigateToHome = { navController.navigate(TicketingScreens.Splash.name) },
+
         navigateToUser = { navController.navigate(TicketingScreens.User.name) }
       )
     }
@@ -144,12 +149,19 @@ fun TicketingApp() {
         MainScreen(
           onEntryButtonCLicked = { navController.navigate(TicketingScreens.EntryScanner.name) },
           onExitButtonClicked = { navController.navigate(TicketingScreens.ExitScanner.name) },
-          onSearchButtonClicked = { navController.navigate(TicketingScreens.Search.name) }
+          onSearchButtonClicked = { navController.navigate(TicketingScreens.Search.name) },
+          onStatsButtonClicked = { navController.navigate(TicketingScreens.Stats.name) }
         )
       }
 
       composable(route = TicketingScreens.Login.name) {
-        LoginScreen(onSuccessfulLogin = { navController.navigate(TicketingScreens.Splash.name) { popUpTo(TicketingScreens.Splash.name) { inclusive = false } } })
+        LoginScreen(navController = navController, onSuccessfulLogin = { navController.navigate(TicketingScreens.Splash.name) { popUpTo(TicketingScreens.Splash.name) { inclusive = false } } })
+      }
+
+      composable(route = TicketingScreens.Admin.name) {
+        AdminScreen() {
+          navController.navigate(TicketingScreens.Splash.name) { popUpTo(TicketingScreens.Splash.name) { inclusive = false } }
+        }
       }
 
       composable(route = TicketingScreens.User.name) {
@@ -217,6 +229,12 @@ fun TicketingApp() {
         route = TicketingScreens.Search.name
       ) {
         SearchVehicleScreen(navController = navController)
+      }
+
+      composable(
+        route = TicketingScreens.Stats.name
+      ) {
+        StatsScreen()
       }
     }
   }

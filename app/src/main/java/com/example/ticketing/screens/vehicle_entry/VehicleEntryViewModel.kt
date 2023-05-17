@@ -18,6 +18,7 @@ class VehicleEntryViewModel @Inject constructor(
   val vehicle = mutableStateOf(Vehicle())
   val qrExists = mutableStateOf(false)
   val gate = mutableStateOf("")
+  val phoneNumber = accountService.currentUserPhone
 
   suspend fun onLaunchedEffect(newValue: String) {
     storageService.getActiveVehicle(newValue)
@@ -26,8 +27,8 @@ class VehicleEntryViewModel @Inject constructor(
         return
       }
     vehicle.value = vehicle.value.copy(qrReference = newValue)
-    accountService.currentUserPhone.collect {
-      gate.value = storageService.getGate(it)
+    phoneNumber.collect {
+      gate.value = storageService.getUserRecord().gate
       vehicle.value = vehicle.value.copy(entryMobile = it)
       vehicle.value = vehicle.value.copy(entryGate = gate.value)
     }

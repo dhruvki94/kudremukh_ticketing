@@ -21,5 +21,8 @@ data class Vehicle(
   val status:  String = "",
   val exemptRemark: String = "",
   val entryMobile: String = "",
-  val exitMobile: String = ""
+  val exitMobile: String = "",
+  val cardLost: Boolean? = null,
+  val fined: Boolean? = null,
+  val totalFineLevied: Int? = null
 )
