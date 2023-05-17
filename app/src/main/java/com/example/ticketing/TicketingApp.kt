@@ -131,6 +131,7 @@ fun TicketingApp() {
           '/'
         ) == TicketingScreens.Main.name,
         navigateToHome = { navController.navigate(TicketingScreens.Splash.name) },
+
         navigateToUser = { navController.navigate(TicketingScreens.User.name) }
       )
     }

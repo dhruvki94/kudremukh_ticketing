@@ -39,6 +39,7 @@ constructor(
       .firstOrNull()
   }
 
+
   override suspend fun getActiveVehicleByVehicleDigits(vehicleDigits: String): List<Vehicle> {
     return activeCollection()
       .whereEqualTo("vehicleDigits", vehicleDigits)
