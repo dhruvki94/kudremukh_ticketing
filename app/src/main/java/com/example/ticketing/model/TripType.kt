@@ -4,7 +4,8 @@ enum class TripType {
   Other,
   Trek,
   Transit,
-  Stay;
+  Stay,
+  Inspection;
 
   companion object {
     fun getByName(name: String?): TripType {

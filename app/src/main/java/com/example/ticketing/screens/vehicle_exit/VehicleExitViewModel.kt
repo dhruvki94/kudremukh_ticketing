@@ -69,7 +69,6 @@ constructor(
 
   fun update() {
     viewModelScope.launch {
-      println("Vehicle ID: ${pastVehicle.value}")
       if (pastVehicle.value.id.isNotBlank())
         storageService.update(pastVehicle.value)
     }
@@ -88,6 +87,10 @@ constructor(
   }
 
   private fun calculateTime() {
+    if (vehicle.value.tripType == TripType.Inspection.name) {
+      vehicle.value = vehicle.value.copy(status = VehicleStatus.OnTime.name)
+      return
+    }
     val entryTimestamp = vehicle.value.entryTimestamp
     val exitTimestamp = vehicle.value.exitTimestamp ?: System.currentTimeMillis()
     val minutesTaken = ((exitTimestamp - entryTimestamp) / 1000) / 60
@@ -249,6 +252,10 @@ constructor(
   }
 
   private fun calculateFine() {
+    if (vehicle.value.tripType == TripType.Inspection.name) {
+      vehicle.value = vehicle.value.copy(totalFineLevied = 0, fined = false)
+      return
+    }
     if (vehicle.value.vehicleType == VehicleType.TwoWheeler.name) {
       val cardFine = config.value.twoWheeler.cardFine
       val fine = config.value.twoWheeler.fine

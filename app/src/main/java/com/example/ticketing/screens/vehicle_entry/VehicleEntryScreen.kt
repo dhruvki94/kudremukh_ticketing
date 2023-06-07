@@ -295,6 +295,12 @@ fun VehicleEntryScreen(
       onClick = {
         if (vehicle.vehicleNumber.isBlank() || vehicleNumberDigits.isBlank())
           showVehicleNumberDialog.value = true
+        else if (vehicle.driverMobile.length != 10)
+          Toast.makeText(context, "Enter 10 digit mobile number!", Toast.LENGTH_LONG).show()
+        else if (vehicle.driverName.isBlank())
+          Toast.makeText(context, "Enter Driver Name!", Toast.LENGTH_LONG).show()
+        else if (vehicle.noOfPassengers.isBlank())
+          Toast.makeText(context, "Enter No of Passengers!", Toast.LENGTH_LONG).show()
         else {
           Toast.makeText(context, "Success!", Toast.LENGTH_LONG).show()
           scope.launch {
